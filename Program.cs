@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net.NetworkInformation;
 
 namespace SortingAlgorithms
 {
@@ -64,11 +65,65 @@ namespace SortingAlgorithms
             //PrintArray(students);
 
             int[] mergeArray = { 3, 2, 5, 6, 7, 4, 1, 0 };
-            MergeSort(mergeArray);
-
+            //MergeSort(mergeArray);
+            //Console.WriteLine();
+            QuickSort(mergeArray);
         }
 
-        
+        public static void QuickSort(int[] arr)
+        {
+            if (arr == null) return;
+            if (arr.Length == 0) return;
+            QuickSortHelper(arr, 0, arr.Length - 1);
+        }
+
+
+        /// <summary>
+        /// Utilizes a quick sort algorithm to sort the passed in array
+        /// </summary>
+        /// <param name="arr"> the array which should be sorted </param>
+        /// <param name="low"> the smaller index of the (sub)array </param>
+        /// <param name="high"> the larger index of the (sub)array </param>
+        public static void QuickSortHelper(int[] arr, int low, int high)
+        {
+            if (low < high)
+            {
+                // Partition return pivot location to us
+                int pivotIndex = Partition(arr, low, high);
+
+                // Call QuickSort again on the new subarrays pased on pivots position
+                QuickSortHelper(arr, low, pivotIndex - 1);
+                QuickSortHelper(arr, pivotIndex + 1, high);
+            }
+        }
+
+        public static int Partition(int[] arr, int low, int high)
+        {
+            int pivot = arr[high]; // setting pivot to be the last value in the array
+            int i = low - 1;
+
+            for (int j = low; j < high; j++)
+            {
+                if (arr[j] < pivot)
+                {
+                    i++;
+                    Swap(arr, i, j);
+                }
+            }
+
+            Swap(arr, ++i, high);
+            return i;
+        }
+
+        public static void Swap(int[] arr, int i, int j)
+        {
+            // swap - could also move this into a helper method
+            int temp = arr[j];
+            arr[j] = arr[i];
+            arr[i] = temp;
+        }
+
+
         // Responsible for splitting the array up and eventually merging it together
         // Calls itself recursively
         public static void MergeSort(int[] arr)
@@ -79,18 +134,50 @@ namespace SortingAlgorithms
             int[] leftSubArray = new int[mid];
             int[] rightSubArray = new int[arr.Length - mid];
 
-            for(int i = 0; i < mid; i++)
+            for (int i = 0; i < mid; i++)
             {
                 leftSubArray[i] = arr[i];
             }
 
-            for(int i = mid; i < arr.Length; i++)
+            for (int i = mid; i < arr.Length; i++)
             {
-                rightSubArray[i- mid] = arr[i];
+                rightSubArray[i - mid] = arr[i];
             }
 
             MergeSort(leftSubArray);
             MergeSort(rightSubArray);
+            Merge(arr, leftSubArray, rightSubArray);
+        }
+
+        public static void Merge(int[] arr, int[] leftArr, int[] rightArr)
+        {
+            int arrIndex = 0, leftIndex = 0, rightIndex = 0;
+
+            // while the leftArr has values and the right array has values 
+            // we will evaluate which value is lesser - and make assignments
+            while (leftIndex < leftArr.Length && rightIndex < rightArr.Length)
+            {
+                if (leftArr[leftIndex] <= rightArr[rightIndex])
+                {
+                    arr[arrIndex++] = leftArr[leftIndex++];
+                }
+                else
+                {
+                    arr[arrIndex++] = rightArr[rightIndex++];
+                }
+            }
+
+            // copy remaining elements from left array, if any
+            while (leftIndex < leftArr.Length)
+            {
+                arr[arrIndex++] = leftArr[leftIndex++];
+            }
+
+            // copy remaining elements from right array, if any
+            while (rightIndex < rightArr.Length)
+            {
+                arr[arrIndex++] = rightArr[rightIndex++];
+            }
         }
 
         public static void PrintArray(int[] arr)
